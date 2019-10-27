@@ -1,0 +1,157 @@
+<!-- Exemplo Webphone com interface propria ou oculto -->
+<html>
+    <body>
+        <div id="widget-evoline-api-container" style="display:inline" width="10" height="20"></div>
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js">
+        </script>
+        <script>
+            //todas as mensagens oriundas do webphone são recebidas aqui.
+            window.onmessage = function(e) {
+                //quando receber uma ligacao
+                if (e.data.message == 'chegandoChamada') {
+                    alert('Chegando Chamada de ' + e.data.numeroChegando + ' para: ' + e.data.numeroDestino + ' chamada_recebida_id: ' + e.data.chamadaRecebidaId);
+                }
+                //conectado, desconectado, chamando, encerrada, conversando
+                if (e.data.message == 'status') {
+                    //alert('Status: ' + e.data.status);
+                }
+                //o id é único e pode ser utilizado na api para recuperação de mais informações (get na api ou webhooks) 
+                if (e.data.message == 'chamada_id') {
+                    alert('Chamada_id: ' + e.data.chamada_id);
+                }
+                //os erros são finais
+                if (e.data.message == 'status_erro') {
+                    //alert('Sem Permissão: ' + e.data.status_erro);
+                }
+                
+                //rebendo o status de diagnóstico de internet e computador para verificar qualidade de ligação
+                if (e.data.message == 'stats_webphone') {
+                    //alert('Internet: ' + e.data.internet + ' e computador: ' + e.data.computador);
+                }
+    
+            };
+    
+            //encerra chamada ativa
+            function desligaChamada() {
+                webphone.contentWindow.postMessage({
+                    message: 'hangup'
+                }, '*');
+            }
+    
+            //Conecta o webphone para coloca-lo em operação
+            function conectar(){
+                webphone.contentWindow.postMessage({message : 'conectar'}, '*');
+            }
+
+            //desconecta o webphone - ele nao recebe nem envia mais chamadas
+            function desconectar(){
+                webphone.contentWindow.postMessage({message : 'desconectar'}, '*');
+            }
+
+            
+            //telefona para um número
+            function chamaNumero(numero) {
+                webphone.contentWindow.postMessage({
+                    message: 'chamaNumero',
+                    'numero': numero
+                }, '*');
+            }
+    
+            //atender
+            function atender() {
+                webphone.contentWindow.postMessage({
+                    message: 'answer'
+                }, '*');
+            }
+    
+            //para uso com uras
+            function enviaDTMF(meuDTMF) {
+                webphone.contentWindow.postMessage({
+                    message: 'enviaDTMF',
+                    'dtmf': meuDTMF
+                }, '*');
+            }
+    
+            //mute microfone
+            function mute() {
+                webphone.contentWindow.postMessage({
+                    message: 'mute'
+                }, '*');
+            }
+    
+            //transferencia blind - encerra a ligação aqui e transfere para o numero
+            function transferir(numeroTelefone) {
+                webphone.contentWindow.postMessage({
+                    message: 'transferir',
+                    'numeroTelefone': numeroTelefone
+                }, '*');
+            }
+    
+            //transferencia com consulta
+            function transferirConsulta(numeroTelefone) {
+                webphone.contentWindow.postMessage({
+                    message: 'transferirConsulta',
+                    'numeroTelefone': numeroTelefone
+                }, '*');
+            }
+
+            function recstart() {
+                webphone.contentWindow.postMessage({
+                    message: 'recStart'
+                }, '*');
+            }
+
+            function recstop() {
+                webphone.contentWindow.postMessage({
+                    message: 'recStop'
+                }, '*');                
+            }
+        </script>
+        <!-- URL que foi pega pela API no /webphone - cria o iframe e injeta o webphone-->
+        <script src="URL_WEBPHONE_API_TOTALVOICE"></script>
+        
+        <h3>Total Phone</h3>
+
+        <input type="button" onclick="javascript:conectar();" value="Conectar"> 
+        <input type="button" onclick="javascript:desconectar();" value="Desconectar"> <br>
+        <br>
+
+        <input type="button" onclick="javascript:desligaChamada();" value="Desliga">
+        <input type="button" onclick="javascript:atender();" value="Atender">
+        <input type="button" onclick="javascript:chamaNumero(48996525859);" value="Chama (48) 99652-5859">
+        <br>
+
+        <br>
+        <input type="button" onclick="javascript:enviaDTMF('1');" value="DTMF 1">
+        <input type="button" onclick="javascript:enviaDTMF('2');" value="DTMF 2">
+        <input type="button" onclick="javascript:enviaDTMF('3');" value="DTMF 3">
+        <br>
+        <input type="button" onclick="javascript:enviaDTMF('4');" value="DTMF 4">
+        <input type="button" onclick="javascript:enviaDTMF('5');" value="DTMF 5">
+        <input type="button" onclick="javascript:enviaDTMF('6');" value="DTMF 6">
+        <br>
+        <input type="button" onclick="javascript:enviaDTMF('7');" value="DTMF 7">
+        <input type="button" onclick="javascript:enviaDTMF('8');" value="DTMF 8">
+        <input type="button" onclick="javascript:enviaDTMF('9');" value="DTMF 9">
+        <br>
+        <input type="button" onclick="javascript:enviaDTMF('*');" value="DTMF *">
+        <input type="button" onclick="javascript:enviaDTMF('0');" value="DTMF 0">
+        <input type="button" onclick="javascript:enviaDTMF('#');" value="DTMF #">
+        <br>
+
+        <br>
+        <input type="button" onclick="transferirConsulta('4000');" value="Transfere - Consulta">
+        <input type="button" onclick="transferir('4000');" value="Transferir - Direto">
+        <br>
+        
+        <br>
+        <input type="button" onclick="javascript:recstart();" value="Inicar gravação">
+        <input type="button" onclick="javascript:recstop();" value="Parar gravação">
+        <br>
+
+        <br>
+        <input type="button" onclick="javascript:mute();" value="Mute/Unmute">
+        
+    </body>
+    
+</html>
